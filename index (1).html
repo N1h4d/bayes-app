@@ -1,0 +1,187 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Bayes’ Theorem – Real-World AI Applications</title>
+<style>
+:root{--bg:#ffffff;--card:#ffffff;--tx:#111111;--mut:#555555;--ac:#1a56a0;--bd:#cfcfcf;--ok:#1b7a3a;--bad:#b3261e;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#1e1e1e;--card:#1e1e1e;--tx:#eeeeee;--mut:#aaaaaa;--ac:#6ea8ff;--bd:#444444;--ok:#6fcf8f;--bad:#ff8a80}}
+:root[data-theme="dark"]{--bg:#1e1e1e;--card:#1e1e1e;--tx:#eeeeee;--mut:#aaaaaa;--ac:#6ea8ff;--bd:#444444;--ok:#6fcf8f;--bad:#ff8a80}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--tx);font-family:system-ui,-apple-system,"Segoe UI",sans-serif;line-height:1.5}
+main{max-width:920px;margin:0 auto;padding:18px 14px 40px}
+h1{font-size:1.45rem;margin:.2em 0}h2{font-size:1.15rem;margin:.1em 0 .4em}
+.sub{color:var(--mut);margin:0 0 12px;font-size:.95rem}
+.formula{background:var(--card);border:1px dashed var(--ac);border-radius:12px;padding:10px;text-align:center;margin-bottom:14px;overflow-x:auto}
+.tabs{display:flex;flex-wrap:wrap;gap:8px;margin-bottom:12px}
+.tabs button,.btn{padding:9px 12px;border:1px solid var(--bd);background:var(--card);color:var(--tx);border-radius:10px;font:inherit;cursor:pointer}
+.tabs button{flex:1}.tabs .on,.btn.p{background:var(--ac);color:#fff;border-color:var(--ac)}
+.card{background:var(--card);border:1px solid var(--bd);border-radius:14px;padding:14px;margin-bottom:12px}
+.ctl{display:flex;flex-wrap:wrap;gap:8px;margin:10px 0}
+.sl{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:10px}
+.sl label{display:flex;justify-content:space-between;font-size:.9rem}.sl b{color:var(--ac)}
+input[type=range]{width:100%;accent-color:var(--ac)}
+.hide{display:none}.dots{display:grid;grid-template-columns:repeat(50,1fr);gap:2px;margin:10px 0}.dots i{aspect-ratio:1;border-radius:50%}
+.cells{display:grid;grid-template-columns:repeat(20,1fr);gap:2px;align-items:end;min-width:520px}
+.col{text-align:center;font-size:.7rem}
+.bar{background:var(--ac);border-radius:3px 3px 0 0;min-height:2px;transition:height .25s}
+.dr{background:#d9a400;color:#000;border-radius:3px;margin-top:3px;font-size:.65rem}.wl{background:var(--bd);color:var(--mut);border-radius:3px;margin-top:3px;font-size:.65rem}
+.rb{height:22px;font-size:1rem}
+.scroll{overflow-x:auto}
+.stats{display:grid;grid-template-columns:repeat(auto-fit,minmax(130px,1fr));gap:8px;margin-top:10px}
+.stats div{border:1px solid var(--bd);border-radius:10px;padding:8px;text-align:center;font-size:.85rem;color:var(--mut)}.stats b{display:block;font-size:1.2rem;color:var(--tx)}
+.log{font-size:.85rem;color:var(--mut);min-height:2.6em}
+canvas{width:100%;height:200px;display:block}
+table{width:100%;border-collapse:collapse;font-size:.88rem}td,th{padding:5px 6px;border-bottom:1px solid var(--bd);text-align:center}
+.theme{float:right}input[type=text]{width:100%;padding:8px;border:1px solid var(--bd);border-radius:8px;background:var(--card);color:var(--tx);font:inherit}
+.real{font-size:.88rem;border-left:3px solid var(--ac);padding-left:10px;color:var(--mut)}
+
+.q{font-size:1.25rem;font-weight:600;text-align:center;margin:12px 0}
+.ctl{display:flex;flex-wrap:wrap;gap:8px;justify-content:center;margin:8px 0}
+.chips{display:flex;flex-wrap:wrap;gap:6px;margin:8px 0}.chips span{border:1px solid var(--bd);border-radius:20px;padding:2px 10px;font-size:.85rem}
+.row{display:grid;grid-template-columns:110px 1fr 56px;gap:8px;align-items:center;font-size:.9rem;margin:3px 0}
+.pbar{height:14px;background:var(--bd);border-radius:7px;overflow:hidden}.pbar i{display:block;height:100%;background:var(--ac);transition:width .3s}
+.stats{display:grid;grid-template-columns:repeat(auto-fit,minmax(130px,1fr));gap:8px;margin:10px 0}
+.stats div{border:1px solid var(--bd);border-radius:10px;padding:8px;text-align:center;font-size:.85rem;color:var(--mut)}.stats b{display:block;font-size:1.15rem;color:var(--tx)}
+.clue{display:flex;gap:8px;align-items:flex-start;border:1px solid var(--bd);border-radius:10px;padding:8px 10px;margin:6px 0;cursor:pointer}
+.clue small{color:var(--mut);display:block}
+
+.verdict{text-align:center;font-weight:600;margin:8px 0}
+textarea{width:100%;min-height:70px;padding:8px;border:1px solid var(--bd);border-radius:8px;background:var(--card);color:var(--tx);font:inherit}
+.chips button{padding:4px 10px;font-size:.82rem;border-radius:20px}
+h1{font-size:1.5rem;font-weight:600}h2{font-size:1.15rem;font-weight:600}
+.card{border-radius:4px;box-shadow:none;padding:16px}
+.btn,.tabs button{border-radius:4px;padding:8px 14px}
+.formula{border:1px solid var(--bd);border-radius:4px;font-size:1rem}
+.real{background:none;border-left:3px solid var(--bd);border-radius:0;padding:4px 12px}
+.stats div{border-radius:4px}
+.dots i{border-radius:1px}
+
+.wg{display:grid;grid-template-columns:repeat(4,1fr);gap:4px;max-width:420px;margin:10px auto}.wg>*{aspect-ratio:1;border:1px solid var(--bd);border-radius:4px;display:flex;flex-direction:column;align-items:center;justify-content:center;background:var(--card);color:var(--tx);font:inherit;font-size:.85rem;padding:2px;text-align:center;overflow:hidden}.wg b{font-size:1.05rem}.wg small,.wg span{font-size:.7rem;opacity:.8}.wg button{cursor:pointer}.wg .best{outline:3px solid var(--ac);outline-offset:-3px}
+</style>
+</head>
+<body>
+<main>
+<button class="btn theme" id="th">Theme</button>
+<h1>Bayes’ Theorem – Real-World AI Applications</h1>
+<p class="sub">Chapter 6 · Problem 1: Robot localization · Problem 2: Spam detection · Problem 3: AI Mind Reader</p>
+<div class="formula"><b>P(x|z) = P(z|x) · P(x) / P(z)</b> &nbsp;→&nbsp; <i>new belief = likelihood × old belief, normalized</i></div>
+<div class="tabs"><button class="on" data-t="1">Robot Localization</button><button data-t="2">Spam Filter</button><button data-t="3">AI Mind Reader</button></div>
+<section id="t1">
+<div class="card">
+<h2>Problem 1: Robot localization (Bayes filter)</h2>
+<p class="real">Real-world use: robot vacuum cleaners, warehouse robots, self-driving cars, drones and phone navigation. They never know their exact position, so they keep a <b>belief</b> (probability for every place) and update it with Bayes’ rule after every noisy sensor reading. This is the basis of Monte Carlo localization and Kalman filters.</p>
+<p class="sub">A robot is somewhere in a circular corridor of 20 cells. Some cells have a <b>door (D)</b>, others a <b>wall (W)</b>. The robot starts with no idea where it is (5% for every cell). Its door sensor is noisy and its wheels slip. Press <b>Sense</b> and the AI updates the belief with <b>P(x | z) &prop; P(z | x) &middot; P(x)</b>. Press <b>Move</b> and the belief shifts (with uncertainty). Repeat Sense and Move a few times: the belief concentrates on the true position, because only one place matches the whole pattern of doors and walls. (You can press Sense several times in a row: every reading is independent evidence. With a noisy sensor the AI may need many steps, which is realistic.)</p>
+<div class="sl"><div><label>Sensor accuracy P(correct reading) <b id="rv1"></b></label><input type="range" id="rsa" min="55" max="99" value="90"></div><div><label>Move success P(moves exactly 1 cell) <b id="rv2"></b></label><input type="range" id="rma" min="50" max="100" value="95"></div></div>
+<div class="ctl"><button class="btn p" id="rse">Sense (read door/wall)</button><button class="btn p" id="rmo">Move 1 cell &rarr;</button><button class="btn p" id="rau">Auto-run &#9654;</button><button class="btn" id="rsh">Show / hide real robot</button><button class="btn" id="rre">New game</button></div>
+<div class="scroll"><div class="cells" id="rcells"></div></div>
+<p class="sub" style="margin:4px 0 0">Bars = belief P(x). <b>D</b> = door, <b>W</b> = wall, <b style="color:var(--bad)">&#9650;</b> = real (hidden) position of the robot, numbers = cell index.</p>
+<div class="stats"><div>Most likely cell<b id="rm1"></b></div><div>Its probability<b id="rm2"></b></div><div>Uncertainty (entropy)<b id="rm3"></b></div><div>Steps taken<b id="rm4"></b></div></div>
+<div class="scroll"><table id="rtb"></table></div>
+<p class="log" id="rlog"></p>
+<p class="real" id="rinfo">Two steps repeat forever: <b>Sense</b> = Bayes update (new evidence sharpens the belief). <b>Move</b> = prediction with the law of total probability: P(x&prime;) = &Sigma; P(x&prime; | x) &middot; P(x), which makes the belief blurrier. Sensing reduces entropy, moving increases it.</p>
+</div>
+</section>
+<section id="t2" class="hide"><div class="card">
+<h2>Problem 2: A spam filter that learns (Naive Bayes classifier)</h2>
+<p class="real">Real-world use: Gmail, Outlook and SMS spam filters, plus phishing and fraud detection. Spam filtering was one of the first large practical uses of Bayes’ rule, popularised by Paul Graham’s 2002 essay “A Plan for Spam”.</p>
+<p class="sub">The classifier is trained on the small email dataset below. For every word it learns P(word | spam) and P(word | not spam), with Laplace smoothing so unseen words cannot break the maths. Type any message and the AI combines the evidence of all words (the “naive” assumption: words are independent). Then <b>teach it</b>: add your message to the training data and watch the model change.</p>
+<div class="chips" id="exs"></div>
+<textarea id="em">Congratulations! You won a free prize, claim your reward now</textarea>
+<div class="ctl"><button class="btn p" id="sp1">Train as SPAM</button><button class="btn p" id="sp0">Train as NOT spam</button><button class="btn" id="spr">Reset training data</button></div>
+<div class="stats"><div>P(spam)<b id="pr3"></b></div><div>Verdict<b id="vd3"></b></div><div>Training emails<b id="st3"></b></div></div>
+<div class="scroll"><table id="tbl3"></table></div>
+<p class="log" id="cl3"></p>
+<p class="log" id="tn3"></p>
+</div></section>
+<section id="t3" class="hide"><div class="card">
+<h2>Problem 3: AI Mind Reader (Akinator-style game)</h2>
+<p class="real">Real-world use: medical diagnosis assistants, fault-finding in machines, and active learning all work this way: update beliefs with Bayes, then ask the most informative next question.</p>
+<p class="sub">Think of one of the 12 animals below. The AI asks Yes/No questions. After every answer the probability of <b>each animal</b> is updated with Bayes’ rule. The AI does not pick questions randomly: it computes the <b>information gain</b> (expected drop in entropy) of every question and asks the best one. You may answer wrongly: the model already assumes an answer error rate (default 8%), so one mistake does not break the game.</p>
+<div class="sl"><div><label>Answer error rate P(wrong answer) <b id="v5"></b></label><input type="range" id="pe" min="1" max="30" value="8"></div></div>
+<div class="q" id="q5"></div>
+<div class="ctl" id="by5"><button class="btn p" id="y5">Yes</button><button class="btn p" id="n5">No</button></div>
+<div class="ctl"><button class="btn" id="r5">New game</button></div>
+<div class="stats"><div>Questions asked<b id="s5a"></b></div><div>Uncertainty (entropy)<b id="s5b"></b></div><div>Top guess<b id="s5c"></b></div></div>
+<div id="b5"></div><div class="chips" id="h5"></div>
+<p class="log" id="l5"></p><p class="real" id="i5"></p>
+<p class="sub">Bayes update: P(animal | answer) = P(answer | animal) · P(animal) / P(answer). Information gain = H(before) − [P(yes)·H(after yes) + P(no)·H(after no)].</p>
+</div></section>
+</main>
+<script>
+const $=id=>document.getElementById(id),sm=a=>a.reduce((x,y)=>x+y,0),pc=x=>(x*100).toFixed(1)+'%',Hn=a=>-a.reduce((s,x)=>s+(x>0?x*Math.log2(x):0),0);
+document.querySelectorAll('.tabs button').forEach(b=>b.onclick=()=>{document.querySelectorAll('.tabs button').forEach(x=>x.classList.toggle('on',x===b));['1','2','3'].forEach(k=>$('t'+k).classList.toggle('hide',b.dataset.t!==k))});
+$('th').onclick=()=>{const r=document.documentElement;r.dataset.theme=getComputedStyle(r).getPropertyValue('--bg').trim()==='#1e1e1e'?'light':'dark'};
+(function(){
+const N=20,D=[1,1,0,1,0,0,1,1,0,0,0,1,1,0,0,0,0,0,1,0];
+let bl,tr,steps,last,msg,show=true;
+const A=()=>$('rsa').value/100,M=()=>$('rma').value/100;
+function reset(){bl=Array(N).fill(1/N);tr=Math.floor(Math.random()*N);steps=0;last=null;msg='Start: no information, so every cell has probability 1/20 = 5%.';draw()}
+function sense(){const a=A(),z=Math.random()<a?D[tr]:1-D[tr],pri=bl.slice(),lk=D.map(d=>d===z?a:1-a),w=pri.map((p,k)=>p*lk[k]),Z=sm(w);
+ bl=w.map(x=>x/Z);last={pri,lk,z,Z};
+ msg=`Sensor says <b>${z?'DOOR':'WALL'}</b>${z===D[tr]?'':' (this reading was a sensor error!)'}. Cells that match the reading get multiplied by ${a.toFixed(2)}, the others by ${(1-a).toFixed(2)}; then everything is divided by P(z) = ${Z.toFixed(3)} so the total is 1.`;draw()}
+function move(){const m=M(),q=(1-m)/2,pr=[q,m,q],nb=Array(N).fill(0);
+ bl.forEach((p,k)=>[0,1,2].forEach(d=>nb[(k+d)%N]+=p*pr[d]));bl=nb;
+ const r=Math.random();tr=(tr+(r<m?1:r<m+q?0:2))%N;steps++;last=null;
+ msg=`Robot moved. Motion model: 1 cell ${(m*100).toFixed(0)}%, stayed ${(q*100).toFixed(0)}%, 2 cells ${(q*100).toFixed(0)}%. The belief shifted right and became blurrier (entropy up).`;draw()}
+function draw(){const mx=Math.max(...bl),bi=bl.indexOf(mx);
+ $('rv1').textContent=(A()*100).toFixed(0)+'%';$('rv2').textContent=(M()*100).toFixed(0)+'%';
+ $('rcells').innerHTML=bl.map((p,k)=>`<div class="col"><div style="height:110px;display:flex;align-items:flex-end"><div class="bar" style="width:100%;height:${p/Math.max(mx,.2)*100}%;${k===bi?'':'opacity:.75'}"></div></div><div>${p>=.01?Math.round(p*100)+'%':'&nbsp;'}</div><div class="${D[k]?'dr':'wl'}">${D[k]?'D':'W'}</div><div class="rb" style="color:var(--bad)">${show&&k===tr?'&#9650;':''}</div><div>${k}</div></div>`).join('');
+ $('rm1').textContent='cell '+bi;$('rm2').textContent=pc(mx);$('rm3').textContent=Hn(bl).toFixed(2)+' bit';$('rm4').textContent=steps;
+ if(last){const post=bl,o=post.map((p,k)=>k).sort((x,y)=>post[y]-post[x]).slice(0,5);
+  $('rtb').innerHTML=`<tr><th>Cell x</th><th>Type</th><th>Prior P(x)</th><th>P(z=${last.z?'door':'wall'} | x)</th><th>Posterior P(x | z)</th></tr>`+o.map(k=>`<tr><td>${k}</td><td>${D[k]?'door':'wall'}</td><td>${pc(last.pri[k])}</td><td>${last.lk[k].toFixed(2)}</td><td><b>${pc(post[k])}</b></td></tr>`).join('');
+ }else $('rtb').innerHTML='<tr><td>Press <b>Sense</b> to see the Bayes update table (top 5 cells).</td></tr>';
+ $('rlog').innerHTML=msg}
+let tm=null,ph=0;
+function stopA(){clearInterval(tm);tm=null;$('rau').innerHTML='Auto-run &#9654;'}
+$('rau').onclick=()=>{if(tm){stopA();return}$('rau').innerHTML='Stop &#9632;';tm=setInterval(()=>{ph?move():sense();ph=1-ph},900)};
+$('rse').onclick=sense;$('rmo').onclick=move;$('rre').onclick=()=>{stopA();reset()};$('rsh').onclick=()=>{show=!show;draw()};
+$('rsa').oninput=draw;$('rma').oninput=draw;reset();})();
+(function(){
+const D0=[['win free prize now',1],['free money claim your reward',1],['urgent your account is suspended click here',1],['limited offer buy now cheap pills',1],['congratulations you won a free gift card',1],['earn money fast work from home',1],['click here to claim your free prize',1],['cheap loans approved instantly no credit check',1],['meeting tomorrow at ten',0],['please review the project report',0],['lunch with the team on friday',0],['can you send me the lecture notes',0],['the assignment deadline is next week',0],['happy birthday see you at the party',0],['thanks for your help with the code',0],['schedule for the exam is attached',0]];
+let D=D0.slice();
+const tok=t=>t.toLowerCase().match(/[a-z]+/g)||[];
+function model(){const m={s:{},h:{},ns:0,nh:0,ts:0,th:0,V:new Set()};D.forEach(([t,l])=>{l?m.ns++:m.nh++;tok(t).forEach(w=>{const k=l?m.s:m.h;k[w]=(k[w]||0)+1;l?m.ts++:m.th++;m.V.add(w)})});return m}
+function run(){const m=model(),ws=[...new Set(tok($('em').value))];$('st3').textContent=m.ns+' spam / '+m.nh+' normal';
+ if(!ws.length){$('pr3').textContent='–';$('vd3').textContent='–';$('tbl3').innerHTML='';$('cl3').textContent='Type a message to classify it.';return}
+ const V=m.V.size;let lo=Math.log(m.ns/m.nh);
+ const rows=ws.map(w=>{const known=m.V.has(w),ps=((m.s[w]||0)+1)/(m.ts+V),ph=((m.h[w]||0)+1)/(m.th+V),c=known?Math.log(ps/ph):0;lo+=c;return{w,known,ps,ph,c}});
+ const p=1/(1+Math.exp(-lo)),mx=Math.max(...rows.map(r=>Math.abs(r.c)),.01);
+ $('pr3').textContent=pc(p);$('vd3').textContent=p>.5?'SPAM':'Not spam';$('vd3').style.color=p>.5?'var(--bad)':'var(--ok)';
+ $('tbl3').innerHTML='<tr><th>Word</th><th>P(word|spam)</th><th>P(word|normal)</th><th>Evidence ln(ratio)</th></tr>'+rows.map(r=>r.known?`<tr><td><b>${r.w}</b></td><td>${r.ps.toFixed(3)}</td><td>${r.ph.toFixed(3)}</td><td><span style="display:inline-block;height:10px;width:${Math.abs(r.c)/mx*60}px;background:${r.c>0?'var(--bad)':'var(--ok)'};border-radius:5px;vertical-align:middle"></span> ${r.c>0?'+':''}${r.c.toFixed(2)}</td></tr>`:`<tr><td>${r.w}</td><td colspan="3" style="color:var(--mut)">unknown word, ignored</td></tr>`).join('');
+ $('cl3').innerHTML=`Bayes in log form: ln(posterior odds) = ln(P(spam)/P(normal)) + Σ ln(P(word|spam)/P(word|normal)) = ln(${m.ns}/${m.nh}) + Σ = <b>${lo.toFixed(2)}</b>, so P(spam) = 1 / (1 + e<sup>−${lo.toFixed(2)}</sup>) = <b>${pc(p)}</b>. Red = pushes toward spam, green = pushes toward normal.`}
+function teach(l){const t=$('em').value.trim();if(!tok(t).length)return;D.push([t,l]);$('tn3').textContent='Added as '+(l?'SPAM':'NOT spam')+'. The model was retrained, so its word probabilities changed.';run()}
+$('exs').innerHTML=['Free prize waiting, click here now','Can you review my report before the meeting','Urgent: claim your cheap loan today','Happy birthday, see you at the party'].map(t=>`<button class="btn" data-t="${t}">${t}</button>`).join('');
+$('exs').onclick=e=>{const t=e.target.dataset.t;if(t){$('em').value=t;$('tn3').textContent='';run()}};
+$('em').oninput=run;$('sp1').onclick=()=>teach(1);$('sp0').onclick=()=>teach(0);$('spr').onclick=()=>{D=D0.slice();$('tn3').textContent='Training data reset.';run()};
+run();
+})();
+(function(){
+const A=[['Cat','🐱'],['Lion','🦁'],['Penguin','🐧'],['Dolphin','🐬'],['Dog','🐶'],['Elephant','🐘'],['Eagle','🦅'],['Snake','🐍'],['Frog','🐸'],['Shark','🦈'],['Bear','🐻'],['Bee','🐝']];
+const Q=[['Is it a mammal?','110111000010'],['Does it spend much of its life in water?','001100001100'],['Can it fly?','000000100001'],['Does it have fur?','110010000010'],['Does it lay eggs?','001000111001'],['Does it eat meat?','111110111110'],['Does it have four legs?','110011001010'],['Is it heavier than an adult human?','010101000110'],['Is it a common household pet?','100010000000'],['Does it live in cold regions?','001000000010'],['Is it legless?','000100010100'],['Can it seriously harm a human?','010001010110'],['Does it have wings?','001000100001'],['Is it a feline (cat family)?','110000000000']];
+let bel,asked,cur,hist,mode,gi,tops;
+const E=()=>+$('pe').value/100,py=(a,q)=>Q[q][1][a]==='1'?1-E():E(),nz=b=>{const s=sm(b);return b.map(x=>x/s)};
+function ev(q){let p=0;bel.forEach((b,a)=>p+=b*py(a,q));const y=nz(bel.map((b,a)=>b*py(a,q))),n=nz(bel.map((b,a)=>b*(1-py(a,q))));return{q,p,ig:Hn(bel)-(p*Hn(y)+(1-p)*Hn(n))}}
+function nxt(){const c=Q.map((_,i)=>i).filter(i=>!asked.has(i)).map(ev).sort((a,b)=>b.ig-a.ig);tops=c.slice(0,3);if(!c.length||!sm(bel)){return guess()}cur=c[0].q;mode='ask'}
+function guess(){if(!(sm(bel)>0)){mode='giveup';return}gi=bel.indexOf(Math.max(...bel));mode='guess'}
+function start(){bel=Array(A.length).fill(1/A.length);asked=new Set();hist=[];gi=-1;$('l5').textContent='Think of one of the 12 animals. The AI starts with a uniform prior (every animal 8.3%).';nxt();show()}
+function ans(yes){
+ if(mode==='guess'){if(yes){mode='won';$('l5').textContent='The AI guessed it in '+hist.length+' questions.'}else{bel[gi]=0;bel=sm(bel)>0?nz(bel):bel;$('l5').textContent='Wrong guess: that animal is removed and the belief is renormalized.';nxt()}return show()}
+ const q=cur,e=ev(q),l=a=>(Q[q][1][a]==='1')===yes?1-E():E();
+ bel=nz(bel.map((b,a)=>b*l(a)));asked.add(q);hist.push([Q[q][0],yes]);
+ $('l5').innerHTML=`You said <b>${yes?'YES':'NO'}</b>. Bayes: P(animal|answer) ∝ P(answer|animal) × P(animal). P(answer|animal) = ${pc(1-E())} if the animal fits, ${pc(E())} if not (noise). P(${yes?'yes':'no'}) was ${pc(yes?e.p:1-e.p)}.`;
+ Math.max(...bel)>.8&&hist.length>=3?guess():nxt();show()}
+function show(){const mx=Math.max(...bel),H=Hn(bel);
+ $('q5').innerHTML=mode==='ask'?Q[cur][0]:mode==='guess'?`Is it a <b>${A[gi][1]} ${A[gi][0]}</b>?`:mode==='won'?'I read your mind!':'I give up – you beat the AI!';
+ $('by5').style.display=mode==='ask'||mode==='guess'?'':'none';
+ $('s5a').textContent=hist.length;$('s5b').textContent=H.toFixed(2)+' bit';$('s5c').textContent=mx>0?A[bel.indexOf(mx)][1]+' '+pc(mx):'–';
+ $('b5').innerHTML=A.map((a,i)=>`<div class="row"><span${bel[i]===mx?' style="font-weight:700"':''}>${a[1]} ${a[0]}</span><div class="pbar"><i style="width:${bel[i]*100}%"></i></div><b>${pc(bel[i])}</b></div>`).join('');
+ $('h5').innerHTML=hist.map(h=>`<span>${h[0]} ${h[1]?'Yes':'No'}</span>`).join('');
+ $('i5').innerHTML=mode==='ask'?'<b>Why this question?</b> The AI computed the expected information gain (entropy drop) of every unasked question: '+tops.map((t,k)=>`<br>${k?'':''}“${Q[t.q][0]}” = <b>${t.ig.toFixed(3)} bit</b>`).join(''):'';
+ $('v5').textContent=$('pe').value+'%'}
+$('y5').onclick=()=>ans(true);$('n5').onclick=()=>ans(false);$('r5').onclick=start;$('pe').oninput=()=>{if(mode==='ask'){nxt()}show()};
+start();})();
+</script>
+</body>
+</html>
